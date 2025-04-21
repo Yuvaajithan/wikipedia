@@ -62,7 +62,7 @@ body, html {
 /* 🔥 BIG, BRIGHT, ANIMATED muzzle flash */
 #muzzle-flash {
   position: absolute;
-  top: 27%;     /* 🔥 Adjust this to move flash vertically */
+  top: 47%;     /* 🔥 Adjust this to move flash vertically */
   right: 62%;   /* 🔥 Adjust this to move flash horizontally */
   width: 200px;
   height: 200px;
