@@ -10,7 +10,7 @@ body, html {
 }
 
 .background {
-  background-image: url('https://github.com/Yuvaajithan/wikipedia/blob/70d5487674fca6cf726879e0fb858dea1235c35e/Cheems.jpg'); /* Angry Cheems with gun */
+  background-image: url('Cheems.jpg'); /* Angry Cheems with gun */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: top center;
