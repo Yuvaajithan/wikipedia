@@ -1,0 +1,97 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body, html {
+  height: 100%;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.background {
+  background-image: url('C:/Users/SSLTP11009/3D Objects/Bio/Cheems.jpg'); /* Angry Cheems with gun */
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-attachment: scroll;
+
+  height: 150vh;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px;
+  position: relative;
+}
+
+.bio {
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 40px;
+  border-radius: 15px;
+  z-index: 2;
+}
+
+.bio h1 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+
+.bio p {
+  font-size: 1.2rem;
+  line-height: 1.6;
+}
+
+.fire-button {
+  margin-top: 20px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  color: white;
+  background-color: red;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.fire-button:hover {
+  background-color: darkred;
+}
+
+/* 🔥 BIG, BRIGHT, ANIMATED muzzle flash */
+#muzzle-flash {
+  position: absolute;
+  top: 27%;     /* 🔥 Adjust this to move flash vertically */
+  right: 62%;   /* 🔥 Adjust this to move flash horizontally */
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, #fff 10%, yellow 40%, orange 60%, transparent 80%);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1;
+  transform: scale(1);
+}
+
+.flash {
+  animation: big-blast 0.5s ease-in-out;
+}
+
+@keyframes big-blast {
+  0% {
+    opacity: 1;
+    transform: scale(0.5) rotate(0deg);
+    filter: blur(2px);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4) rotate(15deg);
+    filter: blur(0px);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(2) rotate(-15deg);
+    filter: blur(4px);
+  }
+}

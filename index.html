@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yuva's Bio</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="background">
+    <div class="bio">
+      <h1>Hands-Up, I'm Yuva Ajithn 👋</h1>
+      <p>An ETL & IDQ Developer | Python Enthusiast | Tech Explorer</p>
+      <p>I love working on data, automation, and building smart solutions.</p>
+      <button class="fire-button" onclick="fireGun()">Touch Here To Die 💀</button>
+    </div>
+    <div id="muzzle-flash"></div>
+  </div>
+
+  <!-- Gunshot sound -->
+  <audio id="gunshot-sound" src="https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"></audio>
+
+  <script>
+    function fireGun() {
+      const flash = document.getElementById('muzzle-flash');
+      const sound = document.getElementById('gunshot-sound');
+      sound.currentTime = 0; // Reset if clicked repeatedly
+      sound.play();
+
+      flash.classList.add('flash');
+      setTimeout(() => {
+        flash.classList.remove('flash');
+      }, 500);
+    }
+  </script>
+</body>
+</html>
