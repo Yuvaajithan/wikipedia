@@ -7,7 +7,6 @@
 body, html {
   height: 100%;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  overflow-x: hidden;
 }
 
 .background {
@@ -31,27 +30,25 @@ body, html {
 
 .bio {
   background-color: rgba(0, 0, 0, 0.5);
-  padding: 40px;
-  border-radius: 15px;
+  padding: 20px;
+  border-radius: 10px;
   z-index: 2;
-  width: 800px; /* ✅ Fixed width */
-  max-width: 90vw;
 }
 
 .bio h1 {
-  font-size: 48px;
+  font-size: 3rem;
   margin-bottom: 20px;
 }
 
 .bio p {
-  font-size: 20px;
+  font-size: 1.2rem;
   line-height: 1.6;
 }
 
 .fire-button {
   margin-top: 20px;
   padding: 12px 20px;
-  font-size: 18px;
+  font-size: 1rem;
   color: white;
   background-color: red;
   border: none;
@@ -64,10 +61,11 @@ body, html {
   background-color: darkred;
 }
 
+/* 🔥 BIG, BRIGHT, ANIMATED muzzle flash */
 #muzzle-flash {
   position: absolute;
-  top: 95px;     /* ✅ Static positioning */
-  right: 820px;
+  top: 12%;     /* 🔥 Adjust this to move flash vertically */
+  right: 60%;   /* 🔥 Adjust this to move flash horizontally */
   width: 200px;
   height: 200px;
   background: radial-gradient(circle, #fff 10%, yellow 40%, orange 60%, transparent 80%);
