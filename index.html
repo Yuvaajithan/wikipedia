@@ -13,9 +13,9 @@
     }
 
     body, html {
-      height: 100%;
+      height: auto; /* Allow content to extend beyond viewport */
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      touch-action: none; /* Prevent default touch behaviors */
+      overflow-y: auto; /* Enable vertical scrolling */
     }
 
     .background {
@@ -86,21 +86,9 @@
     }
 
     @keyframes big-blast {
-      0% {
-        opacity: 1;
-        transform: scale(0.5) rotate(0deg);
-        filter: blur(2px);
-      }
-      50% {
-        opacity: 1;
-        transform: scale(1.4) rotate(15deg);
-        filter: blur(0px);
-      }
-      100% {
-        opacity: 0;
-        transform: scale(2) rotate(-15deg);
-        filter: blur(4px);
-      }
+      0% { opacity: 1; transform: scale(0.5) rotate(0deg); filter: blur(2px); }
+      50% { opacity: 1; transform: scale(1.4) rotate(15deg); filter: blur(0px); }
+      100% { opacity: 0; transform: scale(2) rotate(-15deg); filter: blur(4px); }
     }
 
     .game-section {
@@ -152,6 +140,7 @@
       border: 2px solid #444;
       background-color: #000;
       user-select: none;
+      touch-action: none; /* Prevent scrolling during puzzle interaction */
     }
 
     .puzzle-grid.win-check {
@@ -164,17 +153,21 @@
       height: 118px;
       background-image: url('yuva.png');
       background-size: 360px 360px;
+      background-repeat: no-repeat;
       border: 1px solid #222;
       box-shadow: inset 0 0 5px #000;
       cursor: grab;
       transition: transform 0.2s ease;
-      touch-action: none;
     }
 
     .puzzle-tile.dragging, .puzzle-tile.touched {
       opacity: 0.7;
       border-color: #ff0;
       transform: scale(1.05);
+    }
+
+    .puzzle-tile.debug {
+      border: 2px solid red; /* Temporary for debugging */
     }
 
     .win-message, .lose-message {
@@ -301,7 +294,7 @@
     const winSound = document.getElementById("win-sound");
     const loseSound = document.getElementById("lose-sound");
     const size = 3;
-    const tileSize = 120;
+    let tileSize = window.innerWidth <= 400 ? 100 : 120; // Dynamic tile size
     let tiles = [];
     let timeLeft = 15;
     let timerId = null;
@@ -320,9 +313,12 @@
           tile.style.backgroundPosition = `-${x * tileSize}px -${y * tileSize}px`;
           tile.dataset.order = `${y * size + x}`;
           tile.draggable = true;
+          tile.classList.add("debug"); // Temporary debug borders
+          setTimeout(() => tile.classList.remove("debug"), 5000);
           tiles.push(tile);
         }
       }
+      console.log("Tile positions:", tiles.map(t => t.style.backgroundPosition));
     }
 
     function shuffleTiles() {
@@ -397,7 +393,6 @@
 
       function handleTouchStart(e) {
         if (!isDragging && gameActive) {
-          e.preventDefault();
           console.log("Touch start:", e.target.dataset.order);
           isDragging = true;
           touchStartTile = e.target;
@@ -413,7 +408,6 @@
       }
 
       function handleTouchMove(e) {
-        e.preventDefault();
         if (isDragging && touchStartTile) {
           const touch = e.touches[0];
           const target = document.elementFromPoint(touch.clientX, touch.clientY);
@@ -425,7 +419,6 @@
       }
 
       function handleTouchEnd(e) {
-        e.preventDefault();
         if (isDragging && touchStartTile) {
           console.log("Touch end");
           const touch = e.changedTouches[0];
@@ -445,9 +438,9 @@
         tile.addEventListener("dragover", handleDragOver);
         tile.addEventListener("drop", handleDrop);
         tile.addEventListener("dragend", handleDragEnd);
-        tile.addEventListener("touchstart", handleTouchStart);
-        tile.addEventListener("touchmove", handleTouchMove);
-        tile.addEventListener("touchend", handleTouchEnd);
+        tile.addEventListener("touchstart", handleTouchStart, { passive: false });
+        tile.addEventListener("touchmove", handleTouchMove, { passive: false });
+        tile.addEventListener("touchend", handleTouchEnd, { passive: false });
       });
     }
 
@@ -495,6 +488,7 @@
       hasPlayedImposterSound = false;
       winMessage.style.display = "none";
       loseMessage.style.display = "none";
+      tileSize = window.innerWidth <= 400 ? 100 : 120;
       createTiles();
       shuffleTiles();
       addDragEvents();
@@ -502,6 +496,7 @@
     }
 
     // Initialize game
+    tileSize = window.innerWidth <= 400 ? 100 : 120;
     createTiles();
     shuffleTiles();
     addDragEvents();
@@ -523,6 +518,17 @@
     // Smooth game section reveal
     window.addEventListener('load', () => {
       gameSection.classList.add('visible');
+    });
+
+    // Update tileSize on resize
+    window.addEventListener('resize', () => {
+      const newTileSize = window.innerWidth <= 400 ? 100 : 120;
+      if (newTileSize !== tileSize) {
+        tileSize = newTileSize;
+        createTiles();
+        shuffleTiles();
+        addDragEvents();
+      }
     });
   </script>
 </body>
