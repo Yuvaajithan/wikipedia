@@ -3,8 +3,262 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Yuva's Bio</title>
-  <link rel="stylesheet" href="styles.css"/>
+  <title>Yuva's Bio & Puzzle Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body, html {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .background {
+      background-image: url('Cheems.jpg');
+      background-repeat: no-repeat;
+      background-position: top center;
+      background-attachment: scroll;
+      background-size: 600px auto;
+      min-height: 100vh;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 20px;
+      position: relative;
+    }
+
+    .bio {
+      background-color: rgba(0, 0, 0, 0.5);
+      padding: 20px;
+      border-radius: 10px;
+      z-index: 2;
+    }
+
+    .bio h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+    }
+
+    .bio p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+    }
+
+    .fire-button {
+      margin-top: 20px;
+      padding: 12px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: red;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .fire-button:hover {
+      background-color: darkred;
+    }
+
+    #muzzle-flash {
+      position: absolute;
+      top: 12%;
+      right: 60%;
+      width: 200px;
+      height: 200px;
+      background: radial-gradient(circle, #fff 10%, yellow 40%, orange 60%, transparent 80%);
+      border-radius: 50%;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1;
+      transform: scale(1);
+    }
+
+    .flash {
+      animation: big-blast 0.5s ease-in-out;
+    }
+
+    @keyframes big-blast {
+      0% {
+        opacity: 1;
+        transform: scale(0.5) rotate(0deg);
+        filter: blur(2px);
+      }
+      50% {
+        opacity: 1;
+        transform: scale(1.4) rotate(15deg);
+        filter: blur(0px);
+      }
+      100% {
+        opacity: 0;
+        transform: scale(2) rotate(-15deg);
+        filter: blur(4px);
+      }
+    }
+
+    .game-section {
+      background-color: #111;
+      padding: 40px 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: opacity 1s ease-in;
+    }
+
+    .game-section.visible {
+      opacity: 1;
+    }
+
+    .game-title {
+      font-size: 4rem;
+      color: #ff4757;
+      text-shadow: 0 0 15px #1e90ff, 0 0 30px #1e90ff, 0 0 45px #ff6348;
+      margin-bottom: 40px;
+      text-align: center;
+      font-family: 'Orbitron', sans-serif;
+      animation: shake 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes shake {
+      0% {
+        transform: translateX(0);
+      }
+      25% {
+        transform: translateX(-5px);
+      }
+      50% {
+        transform: translateX(5px);
+      }
+      75% {
+        transform: translateX(-5px);
+      }
+      100% {
+        transform: translateX(0);
+      }
+    }
+
+    .puzzle-container {
+      width: 360px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .puzzle-grid {
+      width: 360px;
+      height: 360px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 2px;
+      border: 2px solid #444;
+      background-color: #000;
+    }
+
+    .puzzle-grid.win-check {
+      border-color: #0f0;
+      transition: border-color 0.3s ease;
+    }
+
+    .puzzle-tile {
+      width: 118px;
+      height: 118px;
+      background-image: url('C:/Users/SSLTP11009/3D Objects/Bio/Game/yuva.png');
+      background-size: 360px 360px;
+      border: 1px solid #222;
+      box-shadow: inset 0 0 5px #000;
+      cursor: grab;
+      transition: transform 0.2s ease;
+    }
+
+    .puzzle-tile.dragging {
+      opacity: 0.7;
+      border-color: #ff0;
+    }
+
+    .win-message, .lose-message {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 24px;
+      color: #00ff00;
+      font-weight: bold;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px #0f0;
+      z-index: 10;
+    }
+
+    .lose-message {
+      color: #ff4757;
+      box-shadow: 0 0 10px #ff4757;
+    }
+
+    .timer {
+      font-size: 1.5rem;
+      color: #ff4757;
+      font-family: 'Orbitron', sans-serif;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .reset-button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      color: white;
+      background-color: #ff4757;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      transition: background 0.3s ease;
+    }
+
+    .reset-button:hover {
+      background-color: #cc1a2f;
+    }
+
+    @media (max-width: 400px) {
+      .puzzle-container {
+        width: 300px;
+      }
+
+      .puzzle-grid {
+        width: 300px;
+        height: 300px;
+      }
+
+      .puzzle-tile {
+        width: 98px;
+        height: 98px;
+        background-size: 300px 300px;
+      }
+
+      .game-title {
+        font-size: 2.5rem;
+      }
+
+      .timer {
+        font-size: 1.2rem;
+      }
+
+      .reset-button {
+        font-size: 0.9rem;
+        padding: 8px 16px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="background">
@@ -17,21 +271,212 @@
     <div id="muzzle-flash"></div>
   </div>
 
-  <!-- Gunshot sound -->
+  <div class="game-section" id="gameSection">
+    <h2 class="game-title">Ready for the Chaos Challenge?😈</h2>
+    <div class="timer" id="timer">Time: 15s</div>
+    <div class="puzzle-container">
+      <div class="puzzle-grid" id="puzzleGrid"></div>
+      <div class="win-message" id="winMessage">Congrats, You’re Not Completely Useless!🧩😂</div>
+      <div class="lose-message" id="loseMessage">You Loser 😝</div>
+    </div>
+    <button class="reset-button" onclick="resetGame()">Reset Game</button>
+  </div>
+
   <audio id="gunshot-sound" src="https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"></audio>
+  <audio id="imposter-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/game.wav"></audio>
+  <audio id="win-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/win.wav"></audio>
+  <audio id="lose-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/lose.wav"></audio>
 
   <script>
+    // Bio gun effect
     function fireGun() {
       const flash = document.getElementById('muzzle-flash');
       const sound = document.getElementById('gunshot-sound');
-      sound.currentTime = 0; // Reset if clicked repeatedly
+      sound.currentTime = 0;
       sound.play();
-
       flash.classList.add('flash');
-      setTimeout(() => {
-        flash.classList.remove('flash');
-      }, 500);
+      setTimeout(() => flash.classList.remove('flash'), 500);
     }
+
+    // Puzzle game
+    const grid = document.getElementById("puzzleGrid");
+    const winMessage = document.getElementById("winMessage");
+    const loseMessage = document.getElementById("loseMessage");
+    const timerDisplay = document.getElementById("timer");
+    const imposterSound = document.getElementById("imposter-sound");
+    const winSound = document.getElementById("win-sound");
+    const loseSound = document.getElementById("lose-sound");
+    const size = 3;
+    const tileSize = 120;
+    let tiles = [];
+    let timeLeft = 15;
+    let timerId = null;
+    let gameActive = true;
+    let hasPlayedImposterSound = false;
+    let isDragging = false;
+
+    function createTiles() {
+      tiles = [];
+      grid.innerHTML = '';
+      for (let y = 0; y < size; y++) {
+        for (let x = 0; x < size; x++) {
+          const tile = document.createElement("div");
+          tile.className = "puzzle-tile";
+          tile.style.backgroundPosition = `-${x * tileSize}px -${y * tileSize}px`;
+          tile.dataset.order = `${y * size + x}`;
+          tile.draggable = true;
+          tiles.push(tile);
+        }
+      }
+    }
+
+    function shuffleTiles() {
+      for (let i = tiles.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+      }
+      tiles.forEach(tile => grid.appendChild(tile));
+    }
+
+    function syncTilesFromDOM() {
+      tiles = Array.from(grid.children);
+    }
+
+    function addDragEvents() {
+      // Clear existing listeners to prevent duplication
+      tiles.forEach(tile => {
+        tile.removeEventListener("dragstart", handleDragStart);
+        tile.removeEventListener("dragover", handleDragOver);
+        tile.removeEventListener("drop", handleDrop);
+        tile.removeEventListener("dragend", handleDragEnd);
+      });
+
+      let dragged;
+      function handleDragStart(e) {
+        if (!isDragging && gameActive) {
+          console.log("Drag start:", e.target.dataset.order);
+          isDragging = true;
+          dragged = e.target;
+          dragged.classList.add("dragging");
+          if (!hasPlayedImposterSound) {
+            imposterSound.currentTime = 0;
+            imposterSound.play().catch(error => {
+              console.error("Imposter sound failed to play on drag:", error);
+            });
+            hasPlayedImposterSound = true;
+          }
+        }
+      }
+
+      function handleDragOver(e) {
+        e.preventDefault();
+      }
+
+      function handleDrop(e) {
+        e.preventDefault();
+        if (isDragging && dragged !== e.target && gameActive) {
+          console.log("Drop on:", e.target.dataset.order);
+          const draggedIndex = tiles.indexOf(dragged);
+          const targetIndex = tiles.indexOf(e.target);
+          // Swap in tiles array
+          [tiles[draggedIndex], tiles[targetIndex]] = [tiles[targetIndex], tiles[draggedIndex]];
+          // Rebuild DOM to match tiles array
+          grid.innerHTML = '';
+          tiles.forEach(tile => grid.appendChild(tile));
+          syncTilesFromDOM();
+          checkWin();
+        }
+        dragged.classList.remove("dragging");
+        isDragging = false;
+      }
+
+      function handleDragEnd() {
+        console.log("Drag end");
+        if (dragged) dragged.classList.remove("dragging");
+        isDragging = false;
+      }
+
+      tiles.forEach(tile => {
+        tile.addEventListener("dragstart", handleDragStart);
+        tile.addEventListener("dragover", handleDragOver);
+        tile.addEventListener("drop", handleDrop);
+        tile.addEventListener("dragend", handleDragEnd);
+      });
+    }
+
+    function startTimer() {
+      clearInterval(timerId);
+      timeLeft = 15;
+      timerDisplay.textContent = `Time: ${timeLeft}s`;
+      timerId = setInterval(() => {
+        timeLeft--;
+        timerDisplay.textContent = `Time: ${timeLeft}s`;
+        if (timeLeft <= 0) {
+          clearInterval(timerId);
+          if (gameActive) {
+            checkWin();
+            if (gameActive) {
+              gameActive = false;
+              loseMessage.style.display = "block";
+              loseSound.currentTime = 0;
+              loseSound.play();
+              setTimeout(() => loseMessage.style.display = "none", 3000);
+            }
+          }
+        }
+      }, 1000);
+    }
+
+    function checkWin() {
+      syncTilesFromDOM();
+      console.log("Checking win condition. Tile order:", tiles.map(t => t.dataset.order));
+      const isCorrect = tiles.every((tile, i) => parseInt(tile.dataset.order, 10) === i);
+      if (isCorrect && gameActive) {
+        gameActive = false;
+        clearInterval(timerId);
+        winMessage.style.display = "block";
+        winSound.currentTime = 0;
+        winSound.play();
+        setTimeout(() => winMessage.style.display = "none", 3000);
+      }
+      grid.classList.add("win-check");
+      setTimeout(() => grid.classList.remove("win-check"), 300);
+    }
+
+    function resetGame() {
+      gameActive = true;
+      hasPlayedImposterSound = false;
+      winMessage.style.display = "none";
+      loseMessage.style.display = "none";
+      createTiles();
+      shuffleTiles();
+      addDragEvents();
+      startTimer();
+    }
+
+    // Initialize game
+    createTiles();
+    shuffleTiles();
+    addDragEvents();
+    startTimer();
+
+    // Play imposter sound when game section is visible
+    const gameSection = document.getElementById('gameSection');
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting && !hasPlayedImposterSound) {
+        imposterSound.currentTime = 0;
+        imposterSound.play().catch(error => {
+          console.error("Imposter sound failed to play on scroll:", error);
+        });
+        hasPlayedImposterSound = true;
+      }
+    }, { threshold: 0.3 });
+    observer.observe(gameSection);
+
+    // Smooth game section reveal
+    window.addEventListener('load', () => {
+      gameSection.classList.add('visible');
+    });
   </script>
 </body>
 </html>
