@@ -15,6 +15,7 @@
     body, html {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      touch-action: none; /* Prevent default touch behaviors */
     }
 
     .background {
@@ -128,21 +129,11 @@
     }
 
     @keyframes shake {
-      0% {
-        transform: translateX(0);
-      }
-      25% {
-        transform: translateX(-5px);
-      }
-      50% {
-        transform: translateX(5px);
-      }
-      75% {
-        transform: translateX(-5px);
-      }
-      100% {
-        transform: translateX(0);
-      }
+      0% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      50% { transform: translateX(5px); }
+      75% { transform: translateX(-5px); }
+      100% { transform: translateX(0); }
     }
 
     .puzzle-container {
@@ -160,6 +151,7 @@
       gap: 2px;
       border: 2px solid #444;
       background-color: #000;
+      user-select: none;
     }
 
     .puzzle-grid.win-check {
@@ -170,17 +162,19 @@
     .puzzle-tile {
       width: 118px;
       height: 118px;
-      background-image: url('yuva.png');
+      background-image: url('C:/Users/SSLTP11009/3D Objects/Bio/Game/yuva.png');
       background-size: 360px 360px;
       border: 1px solid #222;
       box-shadow: inset 0 0 5px #000;
       cursor: grab;
       transition: transform 0.2s ease;
+      touch-action: none;
     }
 
-    .puzzle-tile.dragging {
+    .puzzle-tile.dragging, .puzzle-tile.touched {
       opacity: 0.7;
       border-color: #ff0;
+      transform: scale(1.05);
     }
 
     .win-message, .lose-message {
@@ -263,7 +257,7 @@
 <body>
   <div class="background">
     <div class="bio">
-      <h1>Hands-Up, I'm Yuva Ajithan 👋</h1>
+      <h1>Hands-Up, I'm Yuva Ajithn 👋</h1>
       <p>An ETL & IDQ Developer | Python Enthusiast | Tech Explorer</p>
       <p>I love working on data, automation, and building smart solutions.</p>
       <button class="fire-button" onclick="fireGun()">Touch Here To Die 💀</button>
@@ -283,9 +277,9 @@
   </div>
 
   <audio id="gunshot-sound" src="https://www.soundjay.com/mechanical/sounds/gun-gunshot-01.mp3"></audio>
-  <audio id="imposter-sound" src="game.wav"></audio>
-  <audio id="win-sound" src="win.wav"></audio>
-  <audio id="lose-sound" src="lose.wav"></audio>
+  <audio id="imposter-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/game.wav"></audio>
+  <audio id="win-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/win.wav"></audio>
+  <audio id="lose-sound" src="C:/Users/SSLTP11009/3D Objects/Bio/lose.wav"></audio>
 
   <script>
     // Bio gun effect
@@ -314,6 +308,7 @@
     let gameActive = true;
     let hasPlayedImposterSound = false;
     let isDragging = false;
+    let touchStartTile = null;
 
     function createTiles() {
       tiles = [];
@@ -342,13 +337,25 @@
       tiles = Array.from(grid.children);
     }
 
+    function swapTiles(tile1, tile2) {
+      const index1 = tiles.indexOf(tile1);
+      const index2 = tiles.indexOf(tile2);
+      [tiles[index1], tiles[index2]] = [tiles[index2], tiles[index1]];
+      grid.innerHTML = '';
+      tiles.forEach(tile => grid.appendChild(tile));
+      syncTilesFromDOM();
+      checkWin();
+    }
+
     function addDragEvents() {
-      // Clear existing listeners to prevent duplication
       tiles.forEach(tile => {
         tile.removeEventListener("dragstart", handleDragStart);
         tile.removeEventListener("dragover", handleDragOver);
         tile.removeEventListener("drop", handleDrop);
         tile.removeEventListener("dragend", handleDragEnd);
+        tile.removeEventListener("touchstart", handleTouchStart);
+        tile.removeEventListener("touchmove", handleTouchMove);
+        tile.removeEventListener("touchend", handleTouchEnd);
       });
 
       let dragged;
@@ -376,15 +383,7 @@
         e.preventDefault();
         if (isDragging && dragged !== e.target && gameActive) {
           console.log("Drop on:", e.target.dataset.order);
-          const draggedIndex = tiles.indexOf(dragged);
-          const targetIndex = tiles.indexOf(e.target);
-          // Swap in tiles array
-          [tiles[draggedIndex], tiles[targetIndex]] = [tiles[targetIndex], tiles[draggedIndex]];
-          // Rebuild DOM to match tiles array
-          grid.innerHTML = '';
-          tiles.forEach(tile => grid.appendChild(tile));
-          syncTilesFromDOM();
-          checkWin();
+          swapTiles(dragged, e.target);
         }
         dragged.classList.remove("dragging");
         isDragging = false;
@@ -396,11 +395,59 @@
         isDragging = false;
       }
 
+      function handleTouchStart(e) {
+        if (!isDragging && gameActive) {
+          e.preventDefault();
+          console.log("Touch start:", e.target.dataset.order);
+          isDragging = true;
+          touchStartTile = e.target;
+          touchStartTile.classList.add("touched");
+          if (!hasPlayedImposterSound) {
+            imposterSound.currentTime = 0;
+            imposterSound.play().catch(error => {
+              console.error("Imposter sound failed to play on touch:", error);
+            });
+            hasPlayedImposterSound = true;
+          }
+        }
+      }
+
+      function handleTouchMove(e) {
+        e.preventDefault();
+        if (isDragging && touchStartTile) {
+          const touch = e.touches[0];
+          const target = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (target && target.classList.contains("puzzle-tile") && target !== touchStartTile) {
+            target.classList.add("touched");
+            setTimeout(() => target.classList.remove("touched"), 200);
+          }
+        }
+      }
+
+      function handleTouchEnd(e) {
+        e.preventDefault();
+        if (isDragging && touchStartTile) {
+          console.log("Touch end");
+          const touch = e.changedTouches[0];
+          const target = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (target && target.classList.contains("puzzle-tile") && target !== touchStartTile && gameActive) {
+            console.log("Touch swap with:", target.dataset.order);
+            swapTiles(touchStartTile, target);
+          }
+          touchStartTile.classList.remove("touched");
+          touchStartTile = null;
+          isDragging = false;
+        }
+      }
+
       tiles.forEach(tile => {
         tile.addEventListener("dragstart", handleDragStart);
         tile.addEventListener("dragover", handleDragOver);
         tile.addEventListener("drop", handleDrop);
         tile.addEventListener("dragend", handleDragEnd);
+        tile.addEventListener("touchstart", handleTouchStart);
+        tile.addEventListener("touchmove", handleTouchMove);
+        tile.addEventListener("touchend", handleTouchEnd);
       });
     }
 
